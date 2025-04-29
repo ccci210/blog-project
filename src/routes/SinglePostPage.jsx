@@ -2,6 +2,7 @@ import Image from "../components/Image";
 import { Link } from "react-router-dom";
 import PostMenuActions from "../components/PostMenuActions";
 import Search from "../components/Search";
+import Comments from "../components/Comments";
 
 const SinglePostPage = () => {
   return (
@@ -95,12 +96,12 @@ const SinglePostPage = () => {
           <div className="flex flex-col pd-4 text-sm gap-2">
             <h2>Categories</h2>
             <div className="flex flex-col">
-              <Link className="text-blue-700 underline">All</Link>
-              <Link className="text-blue-700 underline">Web Design</Link>
-              <Link className="text-blue-700 underline">Development</Link>
-              <Link className="text-blue-700 underline">Databases</Link>
-              <Link className="text-blue-700 underline">Search Engines</Link>
-              <Link className="text-blue-700 underline">Marketing</Link>
+              <Link className="text-gray-700 underline">All</Link>
+              <Link className="text-gray-700 underline">Web Design</Link>
+              <Link className="text-gray-700 underline">Development</Link>
+              <Link className="text-gray-700 underline">Databases</Link>
+              <Link className="text-gray-700 underline">Search Engines</Link>
+              <Link className="text-gray-700 underline">Marketing</Link>
             </div>
           </div>
           {/** Search */}
@@ -108,6 +109,7 @@ const SinglePostPage = () => {
           <Search />
         </div>
       </div>
+      <Comments />
     </div>
   );
 };
