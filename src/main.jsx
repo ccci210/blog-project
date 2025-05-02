@@ -2,7 +2,6 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { Link } from "react-router-dom";
 import Homepage from "./routes/Homepage.jsx";
 import PostListPage from "./routes/PostListPage.jsx";
 import Write from "./routes/Write.jsx";
@@ -10,6 +9,15 @@ import LoginPage from "./routes/LoginPage.jsx";
 import Register from "./routes/Register.jsx";
 import MainLayout from "./layouts/MainLayout.jsx";
 import SinglePostPage from "./routes/SinglePostPage.jsx";
+import { ClerkProvider } from "@clerk/clerk-react";
+
+// Import your Publishable Key
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+console.log(PUBLISHABLE_KEY);
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing Publishable Key");
+}
 
 const router = createBrowserRouter([
   {
@@ -30,6 +38,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <RouterProvider router={router} />
+    </ClerkProvider>
   </StrictMode>
 );
