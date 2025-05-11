@@ -22,7 +22,6 @@ const postSchema = new Schema(
     },
     desc: {
       type: String,
-      required: true,
     },
     content: {
       type: String,
@@ -42,4 +41,4 @@ const postSchema = new Schema(
   }
 );
 
-export default mongoose.model("User", postSchema);
+export default mongoose.model("Post", postSchema);
