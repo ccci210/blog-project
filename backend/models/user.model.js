@@ -3,7 +3,11 @@ import mongoose from "mongoose";
 
 const userSchema = new Schema(
   {
-    name: {
+    clerkUserId: {
+      type: String,
+      required: true,
+    },
+    username: {
       type: String,
       required: true,
       unique: true,
@@ -18,7 +22,7 @@ const userSchema = new Schema(
     },
     savedPosts: [
       {
-        type: [string],
+        type: [String],
         default: [],
       },
     ],
