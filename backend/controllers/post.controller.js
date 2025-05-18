@@ -1,4 +1,5 @@
 import Post from "../models/post.model.js";
+import User from "../models/user.model.js";
 
 export const getPosts = async (req, res) => {
   const posts = await Post.find();
@@ -9,14 +10,15 @@ export const getPost = async (req, res) => {
   res.status(200).send(post);
 };
 export const createPost = async (req, res) => {
-  const clearUserId = req.auth.userId;
-  if (!clearUserId) {
+  const clerkUserId = req.auth.userId;
+
+  if (!clerkUserId) {
     return res.status(401).json({
       message: "Unauthorized",
     });
   }
 
-  const user = await User.findOne({ clerkUserId: clearUserId });
+  const user = await User.findOne({ clerkUserId: clerkUserId });
   if (!user) {
     return res.status(401).json({
       message: "User not found",
@@ -28,16 +30,21 @@ export const createPost = async (req, res) => {
   res.status(200).json(post);
 };
 export const deletePost = async (req, res) => {
-  const clearUserId = req.auth.userId;
-  if (!clearUserId) {
+  const clerkUserId = req.auth.userId;
+  if (!clerkUserId) {
     return res.status(401).json({
       message: "Unauthorized",
     });
   }
-  const user = await User.findOne({ clerkUserId: clearUserId });
-  const post = await Post.findByIdAndDelete({
+  const user = await User.findOne({ clerkUserId: clerkUserId });
+  const deletedPost = await Post.findByIdAndDelete({
     user: user._id,
     _id: req.params.id,
   });
-  res.status(200).json(post);
+  if (!deletedPost) {
+    return res.status(403).json({
+      message: "you can delete only your posts",
+    });
+  }
+  res.status(200).json("Post has been deleted");
 };

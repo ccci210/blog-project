@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classnames from "classnames";
 import Image from "./Image";
 import { Link } from "react-router-dom";
@@ -7,10 +7,21 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
+  useAuth,
 } from "@clerk/clerk-react";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const { getToken } = useAuth();
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await getToken();
+      console.log(token);
+    };
+    fetchToken();
+  }, [getToken]);
+
   console.log(import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT);
   return (
     <div className="w-full h-16 md:h-20 flex items-center justify-between">
