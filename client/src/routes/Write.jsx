@@ -6,11 +6,36 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { IKContext, IKImage, IKUpload } from "imagekitio-react";
+import Upload from "../components/Upload";
+
+const authenticator = async () => {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/posts/upload-auth`
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Request failed with status ${response.status}: ${errorText}`
+      );
+    }
+
+    const data = await response.json();
+    const { signature, expire, token } = data;
+    return { signature, expire, token };
+  } catch (error) {
+    throw new Error(`Authentication request failed: ${error.message}`);
+  }
+};
 
 const Write = () => {
   const { getToken } = useAuth();
   const { isLoaded, isSignedIn } = useUser();
   const [value, setValue] = useState("");
+  const [cover, setCover] = useState("");
+  const [progress, setProgress] = useState(0);
 
   const navigate = useNavigate();
 
@@ -60,9 +85,14 @@ const Write = () => {
         onSubmit={handleSubmit}
         className="flex flex-col gap-6 flex-1 mb-10"
       >
-        <button className="w-max p-2 shadow-md text-sm text-gray-500 bg-white font-bold py-2 px-4 rounded-full">
+        {/* <button className="w-max p-2 shadow-md text-sm text-gray-500 bg-white font-bold py-2 px-4 rounded-full">
           add a cover image
-        </button>
+        </button> */}
+        <Upload setProgress={setProgress} setData={setCover}>
+          <button className="w-max p-2 shadow-md text-sm text-gray-500 bg-white font-bold py-2 px-4 rounded-full">
+            add a cover image
+          </button>
+        </Upload>
         <input
           type="text"
           placeholder="Title"
@@ -98,7 +128,7 @@ const Write = () => {
           />
         </div>
         <button
-          disabled={mutation.isPending}
+          disabled={mutation.isPending || (0 > progress && progress < 100)}
           className="w-max p-2 shadow-md text-sm text-white bg-blue-500 font-bold py-2 px-4 rounded-full disabled:bg-blue-400 disabled:cursor-not-allowed"
         >
           {mutation.isPending ? "Loading..." : "Send"}

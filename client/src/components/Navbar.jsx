@@ -22,7 +22,6 @@ const Navbar = () => {
     fetchToken();
   }, [getToken]);
 
-  console.log(import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT);
   return (
     <div className="w-full h-16 md:h-20 flex items-center justify-between">
       {/* Logo */}

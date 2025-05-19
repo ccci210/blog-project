@@ -1,5 +1,6 @@
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
+import ImageKit from "imagekit";
 
 export const getPosts = async (req, res) => {
   const posts = await Post.find();
@@ -57,4 +58,21 @@ export const deletePost = async (req, res) => {
     });
   }
   res.status(200).json("Post has been deleted");
+};
+
+const imagekit = new ImageKit({
+  urlEndpoint: process.env.IK_URL_ENDPOINT,
+  publicKey: process.env.IK_PUBLIC_KEY,
+  privateKey: process.env.IK_PRIVATE_KEY,
+});
+console.log(imagekit);
+export const uploadAuth = async (req, res) => {
+  try {
+    const result = imagekit.getAuthenticationParameters();
+    console.log("Generated auth params:", result);
+    res.json(result); // ✅ sets proper JSON Content-Type
+  } catch (error) {
+    console.error("Upload auth error:", error);
+    res.status(500).json({ error: "Failed to generate auth parameters" });
+  }
 };
