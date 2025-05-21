@@ -6,44 +6,36 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { IKContext, IKImage, IKUpload } from "imagekitio-react";
 import Upload from "../components/Upload";
-
-const authenticator = async () => {
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/posts/upload-auth`
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Request failed with status ${response.status}: ${errorText}`
-      );
-    }
-
-    const data = await response.json();
-    const { signature, expire, token } = data;
-    return { signature, expire, token };
-  } catch (error) {
-    throw new Error(`Authentication request failed: ${error.message}`);
-  }
-};
+import { useEffect } from "react";
 
 const Write = () => {
   const { getToken } = useAuth();
   const { isLoaded, isSignedIn } = useUser();
   const [value, setValue] = useState("");
   const [cover, setCover] = useState("");
+  const [img, setImg] = useState("");
+  const [video, setVideo] = useState("");
   const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    img && setValue((prev) => prev + `<img src="${img.url}" alt="image" />`);
+  }, [img]);
+
+  useEffect(() => {
+    video &&
+      setValue(
+        (prev) =>
+          prev +
+          `<p><iframe class="ql-video" src="${video.url}" title="YouTube video player"></iframe></p>`
+      );
+  }, [video]);
 
   const navigate = useNavigate();
 
   const mutation = useMutation({
     mutationFn: async (newPost) => {
-      console.log(newPost);
       const token = await getToken();
-      console.log(token, `${import.meta.env.VITE_API_URL}/posts`);
       return axios.post(`${import.meta.env.VITE_API_URL}/posts`, newPost, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -51,7 +43,6 @@ const Write = () => {
       });
     },
     onSuccess: (data) => {
-      console.log("Mutation succeeded:", data);
       toast.success("Post created successfully!");
       navigate(`/${data.data.slug}`);
     },
@@ -70,6 +61,7 @@ const Write = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = {
+      img: cover.path || "",
       title: formData.get("title"),
       desc: formData.get("desc"),
       category: formData.get("category"),
@@ -85,10 +77,7 @@ const Write = () => {
         onSubmit={handleSubmit}
         className="flex flex-col gap-6 flex-1 mb-10"
       >
-        {/* <button className="w-max p-2 shadow-md text-sm text-gray-500 bg-white font-bold py-2 px-4 rounded-full">
-          add a cover image
-        </button> */}
-        <Upload setProgress={setProgress} setData={setCover}>
+        <Upload type="image" setProgress={setProgress} setData={setCover}>
           <button className="w-max p-2 shadow-md text-sm text-gray-500 bg-white font-bold py-2 px-4 rounded-full">
             add a cover image
           </button>
@@ -115,16 +104,21 @@ const Write = () => {
           placeholder="Description"
           className="p-2 rounded-xl shadow-sm"
         />
-        <div className="flex">
+        <div className="flex flex-1">
           <div className="flex flex-col gap-2 mr-2">
-            <div className="cursor-pointer">🏞️</div>
-            <div className="cursor-pointer">▶️</div>
+            <Upload type="image" setProgress={setProgress} setData={setImg}>
+              🏞️
+            </Upload>
+            <Upload type="video" setProgress={setProgress} setData={setVideo}>
+              ▶️
+            </Upload>
           </div>
           <ReactQuill
             theme="snow"
             className="flex-1 rounded-xl bg-white shadow-md overflow-hidden"
             value={value}
             onChange={setValue}
+            readOnly={0 < progress && progress < 100}
           />
         </div>
         <button

@@ -1,7 +1,7 @@
 import { IKContext, IKUpload } from "imagekitio-react";
 import { useRef } from "react";
 
-const Upload = ({ setProgress, setData, children }) => {
+const Upload = ({ setProgress, setData, type, children }) => {
   const ref = useRef(null);
   const authenticator = async () => {
     try {
@@ -46,6 +46,7 @@ const Upload = ({ setProgress, setData, children }) => {
         onUploadProgress={onUploadProgress}
         ref={ref}
         className="hidden"
+        accept={`${type}/*`}
       />
       <div className="cursor-pointer" onClick={() => ref.current.click()}>
         {children}
