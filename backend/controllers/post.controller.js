@@ -3,8 +3,21 @@ import User from "../models/user.model.js";
 import ImageKit from "imagekit";
 
 export const getPosts = async (req, res) => {
-  const posts = await Post.find();
-  res.status(200).send(posts);
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 2;
+
+  try {
+    const posts = await Post.find()
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    const totalPosts = await Post.countDocuments();
+    const hasMore = page * limit < totalPosts;
+
+    res.status(200).send({ posts, hasMore });
+  } catch (error) {
+    res.status(500).send({ error: "Failed to fetch posts" });
+  }
 };
 export const getPost = async (req, res) => {
   const post = await Post.findOne({ slug: req.params.slug });
