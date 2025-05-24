@@ -8,6 +8,7 @@ export const getPosts = async (req, res) => {
 
   try {
     const posts = await Post.find()
+      .populate("user", "username")
       .limit(limit)
       .skip((page - 1) * limit);
 
@@ -78,7 +79,7 @@ const imagekit = new ImageKit({
   publicKey: process.env.IK_PUBLIC_KEY,
   privateKey: process.env.IK_PRIVATE_KEY,
 });
-console.log(imagekit);
+
 export const uploadAuth = async (req, res) => {
   try {
     const result = imagekit.getAuthenticationParameters();
