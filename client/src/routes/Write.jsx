@@ -57,16 +57,19 @@ const Write = () => {
   if (!isLoaded && !isSignedIn) {
     return <div className="">You should login!</div>;
   }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
+
     const data = {
-      img: cover.path || "",
+      img: cover?.filepath || "",
       title: formData.get("title"),
       desc: formData.get("desc"),
       category: formData.get("category"),
       content: value,
     };
+
     mutation.mutate(data);
   };
 
