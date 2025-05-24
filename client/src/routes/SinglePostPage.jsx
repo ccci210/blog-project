@@ -3,35 +3,54 @@ import { Link } from "react-router-dom";
 import PostMenuActions from "../components/PostMenuActions";
 import Search from "../components/Search";
 import Comments from "../components/Comments";
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { format } from "timeago.js";
+
+const fetchPost = async (slug) => {
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
+  return res.data;
+};
 
 const SinglePostPage = () => {
+  const { slug } = useParams();
+  console.log(slug);
+  const { isPending, error, data } = useQuery({
+    queryKey: ["post", slug],
+    queryFn: () => fetchPost(slug),
+  });
+  if (isPending) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!data) return <div>No data found</div>;
+
   return (
     <div className="flex flex-col gap-8">
       {/** Details */}
       <div className="flex gap-8">
         <div className="lg:w-3/5 flex flex-col gap-8">
           <h1 className="text-xl md:text-3xl xl:text-4xl 2xl:text-5xl font-semibold">
-            Title THItle title title
+            {data.title}
           </h1>
           <div className="flex gap-8 items-center text-sm">
             <span className="">Written by</span>
-            <Link className="text-blue-800">Test</Link>
+            <Link className="text-blue-800">
+              {data.user?.username ?? "default"}
+            </Link>
             <span>on</span>
-            <Link className="text-blue-800">Web design</Link>
-            <span>2 days ago</span>
+            <Link className="text-blue-800">{data.category}</Link>
+            <span>{format(data.createdAt)}</span>
           </div>
-          <p className="text-gray-500 font-medium">
-            This is a long text long text long text long text long text long
-            text. This is a long text long text long text long text long text
-            long text
-          </p>
+          <p className="text-gray-500 font-medium">{data.desc}</p>
         </div>
         <div className="hidden lg:block w-2/5">
-          <Image
-            src="postImg.jpeg"
-            className="rounded-2xl object-cover"
-            width="600"
-          />
+          {data.img && (
+            <Image
+              src={data.img.slice(1)}
+              className="rounded-2xl object-cover"
+              width="600"
+            />
+          )}
         </div>
       </div>
 
@@ -69,13 +88,15 @@ const SinglePostPage = () => {
           <div className="flex flex-col gap-4">
             <h2>Author</h2>
             <div className="flex">
-              <Image
-                src="userImg.jpeg"
-                className="w-12 h-12 rounded-full object-cover"
-                width="48"
-                height="48"
-              />
-              <Link>John D</Link>
+              {data.user?.img && (
+                <Image
+                  src={data.user.img}
+                  className="w-12 h-12 rounded-full object-cover"
+                  width="48"
+                  height="48"
+                />
+              )}
+              <Link>{data.user?.username}</Link>
             </div>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod</p>
             <div className="flex gap-2">
