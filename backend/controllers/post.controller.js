@@ -52,7 +52,6 @@ export const createPost = async (req, res) => {
     existingPost = await Post.findOne({ slug: slug });
     counter++;
   }
-  console.log("slug", slug);
   const newPost = await Post.create({ user: user._id, slug, ...req.body });
   const post = await newPost.save();
   res.status(200).json(post);
@@ -86,10 +85,8 @@ const imagekit = new ImageKit({
 export const uploadAuth = async (req, res) => {
   try {
     const result = imagekit.getAuthenticationParameters();
-    console.log("Generated auth params:", result);
-    res.json(result); // ✅ sets proper JSON Content-Type
+    res.json(result);
   } catch (error) {
-    console.error("Upload auth error:", error);
     res.status(500).json({ error: "Failed to generate auth parameters" });
   }
 };

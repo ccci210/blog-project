@@ -15,7 +15,6 @@ const fetchPost = async (slug) => {
 
 const SinglePostPage = () => {
   const { slug } = useParams();
-  console.log(slug);
   const { isPending, error, data } = useQuery({
     queryKey: ["post", slug],
     queryFn: () => fetchPost(slug),
@@ -46,7 +45,7 @@ const SinglePostPage = () => {
         <div className="hidden lg:block w-2/5">
           {data.img && (
             <Image
-              src={data.img.slice(1)}
+              src={"userImg.jpeg"}
               className="rounded-2xl object-cover"
               width="600"
             />
@@ -90,7 +89,7 @@ const SinglePostPage = () => {
             <div className="flex">
               {data.user?.img && (
                 <Image
-                  src={data.user.img}
+                  src={"userImg.jpeg"}
                   className="w-12 h-12 rounded-full object-cover"
                   width="48"
                   height="48"
@@ -130,7 +129,7 @@ const SinglePostPage = () => {
           <Search />
         </div>
       </div>
-      <Comments />
+      <Comments postId={data._id} />
     </div>
   );
 };
