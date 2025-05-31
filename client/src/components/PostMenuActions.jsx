@@ -26,6 +26,7 @@ const PostMenuActions = ({ post }) => {
     },
   });
   const isSaved = savedPosts?.data?.some((p) => p === post._id) || false;
+  const isAdmin = user?.publicMetadata?.role === "admin" || false;
 
   const deletedMutation = useMutation({
     mutationFn: async () => {
@@ -102,13 +103,24 @@ const PostMenuActions = ({ post }) => {
               d="M12 4C10.3 4 9 5.3 9 7v34l15-9 15 9V7c0-1.7-1.3-3-3-3H12z"
               stroke="black"
               strokeWidth="2"
-              fill={isSaved ? "black" : "none"}
+              fill={
+                saveMutation.isPending
+                  ? isSaved
+                    ? "none"
+                    : "black"
+                  : isSaved
+                  ? "black"
+                  : "none"
+              }
             />
           </svg>
-          <span>Save this action</span>
+          <span>Save this post</span>
+          {saveMutation.isPending && (
+            <span className="text-xs">in progress</span>
+          )}
         </div>
       )}
-      {user && post.user.username === user.username && (
+      {user && (post.user.username === user.username || isAdmin) && (
         <div
           className="flex items-center gap-2 py-2 text-sm cursor-pointer"
           onClick={handleDelete}
