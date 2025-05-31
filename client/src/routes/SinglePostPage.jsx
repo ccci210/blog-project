@@ -110,7 +110,7 @@ const SinglePostPage = () => {
           {/** Action */}
           <div className="flex flex-col">
             <h2>Actions</h2>
-            <PostMenuActions />
+            <PostMenuActions post={data} />
           </div>
           {/** Tags */}
           <div className="flex flex-col pd-4 text-sm gap-2">

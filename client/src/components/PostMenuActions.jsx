@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 const PostMenuActions = ({ post }) => {
   const { user } = useUser();
@@ -24,8 +25,7 @@ const PostMenuActions = ({ post }) => {
       });
     },
   });
-  const isSaved =
-    savedPosts?.data?.some((savedPost) => savedPost._id === post._id) || false;
+  const isSaved = savedPosts?.data?.some((p) => p === post._id) || false;
 
   const deletedMutation = useMutation({
     mutationFn: async () => {
@@ -45,9 +45,41 @@ const PostMenuActions = ({ post }) => {
       console.error("Deletion failed:", error);
     },
   });
+  const queryClient = useQueryClient();
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const token = await getToken();
+      return axios.patch(
+        `${import.meta.env.VITE_API_URL}/users/save`,
+        {
+          postId: post._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    },
+    onSuccess: () => {
+      toast.success("Post is saved successfully!");
+      queryClient.invalidateQueries({ queryKey: ["savedPosts"] });
+    },
+    onError: (error) => {
+      toast.error(error.response.data);
+      console.error("unable to save:", error);
+    },
+  });
 
   const handleDelete = () => {
+    if (!user) {
+      return navigate("/login");
+    }
     deletedMutation.mutate();
+  };
+
+  const handleSave = () => {
+    saveMutation.mutate();
   };
   return (
     <>
@@ -56,7 +88,10 @@ const PostMenuActions = ({ post }) => {
       ) : error ? (
         "Fetching failed"
       ) : (
-        <div className="flex items-center gap-2 py-2 text-sm cursor-pointer">
+        <div
+          className="flex items-center gap-2 py-2 text-sm cursor-pointer"
+          onClick={handleSave}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 48 48"

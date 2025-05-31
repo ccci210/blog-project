@@ -20,12 +20,19 @@ const userSchema = new Schema(
     img: {
       type: String,
     },
-    savedPosts: [
+    savedPosts: {
+      type: [String],
+      default: [],
+    },
+    /**
+     *  savedPosts: [
       {
         type: [String],
         default: [],
       },
     ],
+     * This is wrong since savedPosts should be an array of ObjectId
+     */
   },
   {
     timestamps: true,
