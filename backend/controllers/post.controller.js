@@ -56,6 +56,7 @@ export const createPost = async (req, res) => {
   const post = await newPost.save();
   res.status(200).json(post);
 };
+
 export const deletePost = async (req, res) => {
   const clerkUserId = req.auth.userId;
   if (!clerkUserId) {
@@ -63,7 +64,14 @@ export const deletePost = async (req, res) => {
       message: "Unauthorized",
     });
   }
+
+  const role = req.auth.sessionClaims?.metadata?.role || "user";
+  if (role === "admin") {
+    await Post.findByIdAndDelete(req.params.id);
+    return res.status(200).json("Post has been deleted");
+  }
   const user = await User.findOne({ clerkUserId: clerkUserId });
+
   const deletedPost = await Post.findByIdAndDelete({
     user: user._id,
     _id: req.params.id,

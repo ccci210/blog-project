@@ -8,7 +8,7 @@ export const getUserSavedPosts = async (req, res) => {
       message: "Unauthorized",
     });
   }
-  const user = await User.findOne({ clerkUserId: clerkUserId });
+  const user = await User.findOne({ clerkUserId });
 
   res.status(200).json(user.savedPosts);
 };

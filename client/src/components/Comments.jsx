@@ -9,7 +9,6 @@ const fetchComments = async (postId) => {
   const res = await axios.get(
     `${import.meta.env.VITE_API_URL}/comments/${postId}`
   );
-  console.log("res", res);
   return res.data;
 };
 

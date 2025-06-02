@@ -23,15 +23,7 @@ const fetchPosts = async (pageParam) => {
 };
 
 const PostList = () => {
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
-  } = useInfiniteQuery({
+  const { data, error, fetchNextPage, hasNextPage, status } = useInfiniteQuery({
     queryKey: ["projects"],
     queryFn: ({ pageParam = 1 }) => fetchPosts(pageParam),
     initialPageParam: 1,

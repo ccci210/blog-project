@@ -42,7 +42,6 @@ const PostMenuActions = ({ post }) => {
       navigate("/");
     },
     onError: (error) => {
-      toast.error(error.response.data);
       console.error("Deletion failed:", error);
     },
   });
