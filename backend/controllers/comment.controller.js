@@ -24,6 +24,7 @@ export const addComment = async (req, res) => {
     user: user._id,
     post: postId, //has to be post not postId
   });
+  console.log("New comment:", newComment);
   const savedComment = await newComment.save();
   res.status(201).json(savedComment);
 };
@@ -37,7 +38,7 @@ export const deleteComment = async (req, res) => {
       message: "Unauthorized",
     });
   }
-  const role = req.auth.sessionClaims?.publicMetadata?.role || "user";
+  const role = req.auth.sessionClaims?.metadata?.role || "user";
   if (role === "admin") {
     await Comment.findByIdAndDelete(req.params.id);
     return res.status(200).json("Comment has been deleted");
