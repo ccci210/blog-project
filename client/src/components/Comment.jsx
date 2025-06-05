@@ -6,11 +6,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
-const Comment = ({ comment }) => {
+const Comment = ({ comment, postId }) => {
   const { user } = useUser();
   const { getToken } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isAdmin = user?.publicMetadata?.role === "admin" || false;
 
   const deletedMutation = useMutation({
@@ -27,6 +29,7 @@ const Comment = ({ comment }) => {
     },
     onSuccess: () => {
       toast.success("Comment deleted successfully!");
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
     },
     onError: (error) => {
       console.error("Deletion failed:", error);
@@ -62,6 +65,7 @@ const Comment = ({ comment }) => {
             onClick={handleDelete}
           >
             Delete comment
+            {deletedMutation.isPending && "in progress.."}
           </span>
         )}
       </div>
