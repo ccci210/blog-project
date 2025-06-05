@@ -39,6 +39,7 @@ export const deleteComment = async (req, res) => {
     });
   }
   const role = req.auth.sessionClaims?.metadata?.role || "user";
+  console.log(role);
   if (role === "admin") {
     await Comment.findByIdAndDelete(req.params.id);
     return res.status(200).json("Comment has been deleted");
@@ -50,7 +51,7 @@ export const deleteComment = async (req, res) => {
   });
 
   if (!deletedComment) {
-    return res.status(404).json({
+    return res.status(403).json({
       message:
         "Comment not found or you are not authorized to delete this comment",
     });

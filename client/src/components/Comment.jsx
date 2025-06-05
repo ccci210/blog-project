@@ -1,10 +1,44 @@
 import Image from "./Image";
 import { format } from "timeago.js";
 import { useUser } from "@clerk/clerk-react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useAuth } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 
 const Comment = ({ comment }) => {
   const { user } = useUser();
+  const { getToken } = useAuth();
+  const navigate = useNavigate();
   const isAdmin = user?.publicMetadata?.role === "admin" || false;
+
+  const deletedMutation = useMutation({
+    mutationFn: async () => {
+      const token = await getToken();
+      return axios.delete(
+        `${import.meta.env.VITE_API_URL}/comments/${comment._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    },
+    onSuccess: () => {
+      toast.success("Comment deleted successfully!");
+    },
+    onError: (error) => {
+      console.error("Deletion failed:", error);
+    },
+  });
+
+  const handleDelete = () => {
+    if (!user) {
+      return navigate("/login");
+    }
+    deletedMutation.mutate();
+  };
 
   return (
     <div className="p-4 bg-slate-50 rounded-xl mb-8">
@@ -23,7 +57,10 @@ const Comment = ({ comment }) => {
           {format(comment.createdAt)}
         </span>
         {user && (user.username === comment.user.username || isAdmin) && (
-          <span className="text-red-500 text-sm cursor-pointer">
+          <span
+            className="text-red-500 text-sm cursor-pointer"
+            onClick={handleDelete}
+          >
             Delete comment
           </span>
         )}
